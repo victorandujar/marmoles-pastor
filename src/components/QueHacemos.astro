@@ -1,0 +1,52 @@
+---
+import { empresa, materiales, usos } from '../data/empresa';
+---
+<section id="que-hacemos" aria-labelledby="qh-t" class="scroll-mt-20">
+  <div class="mx-auto max-w-[90rem] px-4 py-20 sm:px-8 sm:py-28">
+    <div class="grid gap-12 lg:grid-cols-12">
+      <div class="lg:col-span-5">
+        <p class="label text-veta-fosc" data-reveal>Qué hacemos</p>
+        <h2 id="qh-t" class="display mt-4 text-[clamp(2.8rem,6vw,5rem)]" data-reveal style="--i:1">De la placa a la pieza.</h2>
+        <p class="mt-6 max-w-md text-lg text-ink-2" data-reveal style="--i:2">{empresa.descripcion}</p>
+      </div>
+      <ol class="lg:col-span-6 lg:col-start-7">
+        {usos.map((u, i) => (
+          <li class="group grid grid-cols-[3rem_1fr] gap-4 border-t border-line py-6 last:border-b" data-reveal style={`--i:${i}`}>
+            <span class="label pt-2 text-veta-fosc">{String(i + 1).padStart(2, '0')}</span>
+            <span>
+              <span class="display block text-[2rem] transition-transform duration-300 group-hover:translate-x-2">{u.t}</span>
+              <span class="mt-1 block text-ink-2">{u.d}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <h3 class="label mt-24 text-ink-2" data-reveal>Materiales</h3>
+    <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {materiales.map((m, i) => (
+        <li class="border border-line bg-paper-2/50" data-reveal style={`--i:${i}`}>
+          <canvas width="320" height="200" class="block aspect-[16/10] w-full" data-swatch={m.id} aria-hidden="true"></canvas>
+          <div class="p-5">
+            <p class="display text-2xl">{m.nombre}</p>
+            <p class="mt-2 text-sm text-ink-2">{m.texto}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<script>
+  import { pintaPedra } from '../scripts/piedra';
+  import type { MaterialId } from '../data/empresa';
+  const io = new IntersectionObserver((es) => {
+    for (const e of es) {
+      if (!e.isIntersecting) continue;
+      io.unobserve(e.target);
+      const c = e.target as HTMLCanvasElement;
+      pintaPedra(c, c.dataset.swatch as MaterialId, 13);
+    }
+  }, { rootMargin: '200px' });
+  document.querySelectorAll<HTMLCanvasElement>('[data-swatch]').forEach((c) => io.observe(c));
+</script>

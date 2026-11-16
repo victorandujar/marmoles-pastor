@@ -1,0 +1,20 @@
+---
+import { empresa, telUrl } from '../data/empresa';
+---
+<header class="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
+  <div class="mx-auto flex h-[4.5rem] max-w-[90rem] items-center justify-between gap-6 px-4 sm:px-8">
+    <a href="#" class="leading-none">
+      <span class="display block text-[1.7rem]">Mármoles Pastor</span>
+      <span class="label mt-1 block text-[0.6rem] text-ink-2">Montcada i Reixac</span>
+    </a>
+    <nav aria-label="Principal" class="hidden lg:block">
+      <ul class="flex gap-8 font-medium">
+        <li><a href="#muestra" class="hover:text-veta">Materiales</a></li>
+        <li><a href="#trabajos" class="hover:text-veta">Trabajos</a></li>
+        <li><a href="#que-hacemos" class="hover:text-veta">Qué hacemos</a></li>
+        <li><a href="#taller" class="hover:text-veta">El taller</a></li>
+      </ul>
+    </nav>
+    <a href={telUrl} class="btn btn-ink hidden min-h-11 px-5 tabular-nums sm:inline-flex">{empresa.phone.display}</a>
+  </div>
+</header>

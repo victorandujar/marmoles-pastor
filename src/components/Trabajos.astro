@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import { trabajos } from '../data/empresa';
+const fotos = import.meta.glob<{ default: ImageMetadata }>('../assets/trabajos/*.jpg', { eager: true });
+const foto = (n: number) => fotos[`../assets/trabajos/trabajo-${String(n).padStart(2, '0')}.jpg`]!.default;
+const spans = ['md:col-span-7', 'md:col-span-5', 'md:col-span-5', 'md:col-span-7', 'md:col-span-6', 'md:col-span-6', 'md:col-span-7', 'md:col-span-5', 'md:col-span-5', 'md:col-span-7'];
+---
+<section id="trabajos" aria-labelledby="trab-t" class="scroll-mt-20 bg-slab text-paper">
+  <div class="mx-auto max-w-[90rem] px-4 py-20 sm:px-8 sm:py-28">
+    <div class="grid gap-6 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-7">
+        <p class="label text-veta-clara" data-reveal>Trabajos</p>
+        <h2 id="trab-t" class="display mt-4 text-[clamp(2.8rem,6vw,5.4rem)]" data-reveal style="--i:1">Hecho en el taller, instalado en casa.</h2>
+      </div>
+      <p class="text-lg text-paper/70 lg:col-span-4 lg:col-start-9" data-reveal style="--i:2">Algunas de las cocinas, barras y escaleras que hemos hecho. Pulsa una foto para verla grande.</p>
+    </div>
+    <ul class="mt-14 grid gap-4 md:grid-cols-12">
+      {trabajos.map((t, i) => (
+        <li class={spans[i]} data-reveal style={`--i:${i % 3}`}>
+          <button type="button" class="group block w-full text-left" data-obre={t.n} aria-label={`Ver grande: ${t.t}`}>
+            <span class="block overflow-hidden">
+              <Image src={foto(t.n)} alt={`${t.t}. ${t.d}`} widths={[480, 800, 1024]} sizes="(min-width: 768px) 55vw, 92vw" class="aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" loading="lazy" />
+            </span>
+            <span class="mt-3 flex items-baseline justify-between gap-4">
+              <span class="font-semibold">{t.t}</span>
+              <span class="label text-[0.65rem] text-paper/50">{String(t.n).padStart(2, '0')}</span>
+            </span>
+            <span class="block text-sm text-paper/60">{t.d}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <dialog class="m-auto max-h-[92dvh] w-[min(96vw,72rem)] bg-transparent p-0 text-paper backdrop:bg-black/85" data-visor>
+    <form method="dialog" class="flex justify-end"><button class="label px-2 py-3 text-paper">Cerrar ✕</button></form>
+    {trabajos.map((t) => (
+      <figure data-foto={t.n} hidden>
+        <Image src={foto(t.n)} alt={`${t.t}. ${t.d}`} widths={[1024]} sizes="96vw" class="max-h-[80dvh] w-full object-contain" loading="lazy" />
+        <figcaption class="mt-3"><strong>{t.t}.</strong> <span class="text-paper/70">{t.d}</span></figcaption>
+      </figure>
+    ))}
+  </dialog>
+</section>
+
+<script>
+  const visor = document.querySelector<HTMLDialogElement>('[data-visor]');
+  document.querySelectorAll<HTMLButtonElement>('[data-obre]').forEach((b) =>
+    b.addEventListener('click', () => {
+      if (!visor) return;
+      visor.querySelectorAll<HTMLElement>('[data-foto]').forEach((f) => { f.hidden = f.dataset.foto !== b.dataset.obre; });
+      visor.showModal();
+    }),
+  );
+  visor?.addEventListener('click', (e) => { if (e.target === visor) visor.close(); });
+</script>
