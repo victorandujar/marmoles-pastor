@@ -1,0 +1,10 @@
+---
+import Legal from '../layouts/Legal.astro';
+import { empresa } from '../data/empresa';
+---
+<Legal title="Aviso legal">
+  <h2>Titular del sitio web</h2>
+  <p>{empresa.legalName} · NIF: <mark>pendiente</mark><br />{empresa.street}, {empresa.postalCode} {empresa.city} ({empresa.region}) · Teléfono: {empresa.phone.display}</p>
+  <h2>Propiedad intelectual</h2>
+  <p>Las fotografías de trabajos pertenecen a {empresa.legalName}. Las muestras de materiales de la portada son ilustraciones generadas para esta web.</p>
+</Legal>

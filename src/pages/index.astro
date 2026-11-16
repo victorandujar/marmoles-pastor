@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Trabajos from '../components/Trabajos.astro';
+import QueHacemos from '../components/QueHacemos.astro';
+import Taller from '../components/Taller.astro';
+import Footer from '../components/Footer.astro';
+import MobileBar from '../components/MobileBar.astro';
+import Schema from '../components/Schema.astro';
+---
+<Base
+  title="Mármoles Pastor · Encimeras de mármol, granito y porcelánico en Montcada i Reixac"
+  description="Marmolistas en Montcada i Reixac (C/ de l'Electricitat, 17). Encimeras de cocina, baños, escaleras y revestimientos en mármol, granito, piedra natural y porcelánico. Tel. 935 64 54 01."
+>
+  <Schema slot="head" />
+  <Header />
+  <main id="contenido">
+    <Hero />
+    <Trabajos />
+    <QueHacemos />
+    <Taller />
+  </main>
+  <Footer />
+  <MobileBar />
+</Base>

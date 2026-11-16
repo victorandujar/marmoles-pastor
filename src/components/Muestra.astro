@@ -1,0 +1,84 @@
+---
+import { materiales } from '../data/empresa';
+---
+<div class="relative" data-muestra>
+  <div class="muestra relative aspect-[4/3] w-full overflow-hidden bg-slab shadow-[0_40px_80px_-40px_rgb(0_0_0/0.6)]">
+    {materiales.map((m, i) => (
+      <canvas width="640" height="480" class="absolute inset-0 h-full w-full transition-opacity duration-700" data-material={m.id} style={i === 0 ? '' : 'opacity:0'} aria-hidden="true"></canvas>
+    ))}
+    <div class="brillo pointer-events-none absolute inset-0" aria-hidden="true"></div>
+    <p class="label pointer-events-none absolute bottom-4 left-4 bg-ink/80 px-3 py-2 text-[0.65rem] text-paper" data-nom-material>Mármol · pulido</p>
+  </div>
+  <div role="radiogroup" aria-label="Material de la muestra" class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+    {materiales.map((m, i) => (
+      <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-tria={m.id} class="border border-line px-3 py-3 text-left text-sm font-semibold transition-colors hover:border-ink aria-checked:border-ink aria-checked:bg-ink aria-checked:text-paper">
+        {m.nombre}
+      </button>
+    ))}
+  </div>
+  <p class="mt-3 text-sm text-ink-2">Muestras generadas para ilustrar cada material. Pasa el cursor o el dedo: así cambia el brillo del pulido con la luz.</p>
+</div>
+
+<style>
+  .brillo {
+    background:
+      radial-gradient(circle at var(--x, 70%) var(--y, 30%), rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 38%),
+      linear-gradient(115deg, rgb(255 255 255 / 0) calc(var(--x, 70%) - 18%), rgb(255 255 255 / 0.16) var(--x, 70%), rgb(255 255 255 / 0) calc(var(--x, 70%) + 18%));
+    mix-blend-mode: soft-light;
+    transition: background-position 200ms;
+  }
+</style>
+
+<script>
+  import { pintaPedra } from '../scripts/piedra';
+  import type { MaterialId } from '../data/empresa';
+
+  document.querySelectorAll<HTMLElement>('[data-muestra]').forEach((root) => {
+    const lienzos = [...root.querySelectorAll<HTMLCanvasElement>('canvas[data-material]')];
+    const botones = [...root.querySelectorAll<HTMLButtonElement>('[data-tria]')];
+    const placa = root.querySelector<HTMLElement>('.muestra');
+    const nom = root.querySelector<HTMLElement>('[data-nom-material]');
+    const pintats = new Set<string>();
+    const pinta = (c: HTMLCanvasElement) => {
+      const id = c.dataset.material as MaterialId;
+      if (pintats.has(id)) return;
+      pintats.add(id);
+      pintaPedra(c, id);
+    };
+    pinta(lienzos[0]!);
+    // La resta, quan el navegador estigui lliure.
+    const resta = () => lienzos.slice(1).forEach(pinta);
+    if ('requestIdleCallback' in window) window.requestIdleCallback(resta, { timeout: 2500 });
+    else setTimeout(resta, 1200);
+
+    const tria = (id: string) => {
+      lienzos.forEach((c) => { if (c.dataset.material === id) pinta(c); c.style.opacity = c.dataset.material === id ? '1' : '0'; });
+      botones.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.tria === id)));
+      if (nom) nom.textContent = `${botones.find((b) => b.dataset.tria === id)?.textContent?.trim() ?? ''} · pulido`;
+    };
+    botones.forEach((b) => b.addEventListener('click', () => tria(b.dataset.tria!)));
+
+    if (!placa) return;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let actiu = false;
+    const mou = (e: PointerEvent) => {
+      const r = placa.getBoundingClientRect();
+      placa.style.setProperty('--x', `${((e.clientX - r.left) / r.width) * 100}%`);
+      placa.style.setProperty('--y', `${((e.clientY - r.top) / r.height) * 100}%`);
+    };
+    placa.addEventListener('pointermove', (e) => { actiu = true; mou(e); });
+    placa.addEventListener('pointerleave', () => { actiu = false; });
+    if (!reduce) {
+      let t0 = performance.now();
+      const deriva = (t: number) => {
+        if (!actiu) {
+          const k = (t - t0) / 6000;
+          placa.style.setProperty('--x', `${50 + Math.sin(k * Math.PI * 2) * 30}%`);
+          placa.style.setProperty('--y', `${40 + Math.cos(k * Math.PI * 2) * 15}%`);
+        } else t0 = t;
+        requestAnimationFrame(deriva);
+      };
+      requestAnimationFrame(deriva);
+    }
+  });
+</script>
